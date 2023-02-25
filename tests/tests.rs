@@ -2,9 +2,8 @@
 
 
 #[cfg(test)]
-mod tests {
+mod test_add {
     use anybase::bytes_manipulation::*;
-
 
     // ---------------------------- add_bytes tests ----------------------------
 
@@ -34,8 +33,17 @@ mod tests {
     }
 
 
-    // ----------------------------------------------- multiply_bytes tests -----------------------------------------------
+    #[test]
+    fn test_add_with_empty() {
+        assert_eq!(add_bytes(vec![1, 2, 3], vec![]), vec![1, 2, 3]);
+    }
+}
 
+#[cfg(test)]
+mod test_multiply {
+    use anybase::bytes_manipulation::*;
+
+    // ----------------------------------------------- multiply_bytes tests -----------------------------------------------
 
     #[test]
     fn test_multiply_bytes() {
@@ -114,6 +122,17 @@ mod tests {
         assert_eq!(multiply_bytes(&vec1, &vec2), result);
     }
 
+    #[test]
+    fn test_multiply_with_empty() {
+        assert_eq!(multiply_bytes(&vec![1, 2, 3], &vec![]), vec![]);
+    }
+
+}
+
+#[cfg(test)]
+mod test_pow {
+    use anybase::bytes_manipulation::*;
+
     // ----------------------------------------------- pow_bytes tests -----------------------------------------------
 
     #[test]
@@ -171,4 +190,86 @@ mod tests {
 
         assert_eq!(pow_bytes(&vec, pow), result);
     }
+
+    #[test]
+    fn test_pow_with_1() {
+        let num: u64 = 1;
+        let pow: u64 = 17;
+
+        let vec   = (num).to_be_bytes().to_vec();
+        let result: Vec<u8> = (num.pow(pow as u32))
+            .to_be_bytes()
+            .to_vec()
+            .into_iter()
+            .skip_while(|&x| x == 0)
+            .collect();
+
+        assert_eq!(pow_bytes(&vec, pow), result);
+    }
+
+    #[test]
+    fn test_pow_with_0() {
+        let num: u64 = 0;
+        let pow: u64 = 17;
+
+        let vec   = (num).to_be_bytes().to_vec();
+        let result: Vec<u8> = (num.pow(pow as u32))
+            .to_be_bytes()
+            .to_vec()
+            .into_iter()
+            .skip_while(|&x| x == 0)
+            .collect();
+
+        assert_eq!(pow_bytes(&vec, pow), result);
+    }
 }
+
+
+#[cfg(test)]
+mod test_encode {
+    use anybase::storage::*;
+
+    // ----------------------------------------------- encode tests -----------------------------------------------
+
+    #[test]
+    fn test_encode_empty_one_byte_1and0() {
+        let alphabet: Vec<u8> = Vec::<u8>::from("01".as_bytes());
+        let data: Vec<u8>     = Vec::<u8>::from("00000000".as_bytes());
+
+        assert_eq!(encode(&alphabet, &data), vec![0 as u8]);
+    }
+
+    #[test]
+    fn test_encode_empty_two_bytes_1and0() {
+        let alphabet: Vec<u8> = Vec::<u8>::from("01".as_bytes());
+        let data: Vec<u8>     = Vec::<u8>::from("0000000000000000".as_bytes());
+
+        assert_eq!(encode(&alphabet, &data), vec![0 as u8, 0 as u8]);
+    }
+
+    #[test]
+    fn test_encode_two_bytes_1and0() {
+        let alphabet: Vec<u8> = Vec::<u8>::from("01".as_bytes());
+        let data: Vec<u8>     = Vec::<u8>::from("0000000000001010".as_bytes());
+
+        assert_eq!(encode(&alphabet, &data), vec![0 as u8, 10 as u8]);
+    }
+
+    #[test]
+    fn test_encode_two_bytes_1and0_2() {
+        let alphabet: Vec<u8> = Vec::<u8>::from("01".as_bytes());
+        let data: Vec<u8>     = Vec::<u8>::from("0000000000011010".as_bytes());
+
+        assert_eq!(encode(&alphabet, &data), vec![0 as u8, 26 as u8]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
