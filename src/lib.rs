@@ -50,7 +50,7 @@ pub mod bytes_manipulation {
         }
     }
     
-    pub fn multiply_bytes(larger: Vec<u8>, smaller: Vec<u8>) -> Vec<u8> {
+    pub fn multiply_bytes(larger: &Vec<u8>, smaller: &Vec<u8>) -> Vec<u8> {
         let mut new_bytes: Vec<u8> = vec![0; larger.len() * 2];
     
         for (index_1, byte_1) in (&larger).iter().rev().enumerate() {
@@ -74,16 +74,46 @@ pub mod bytes_manipulation {
 
         new_bytes[num_leading_zeroes..].to_vec()
     }
+
+    pub fn pow_bytes(bytes: &Vec<u8>, magnitude: u64) -> Vec<u8> { // definitely needs to be optimized... later
+        // TODO: add a hash table or something funny
+
+        let mut result = bytes.clone();
+
+        for _ in 1..magnitude {
+            result = multiply_bytes(&result, &bytes)
+        }
+
+        result
+    }
 }
 
 pub mod storage {
     use std::collections::HashMap;
 
-    pub fn encode(byte_alphabet: Vec<u8>, data: Vec<u8>) -> Vec<u8> {
+    pub fn encode(byte_alphabet: Vec<u8>, data: Vec<u8>) -> Vec<u8> { // optimize later idk
         // create mapping from alphabet to data number
-        let mut map: HashMap<u8, u8> = HashMap::new();
+        let alphabet_len: f32 = byte_alphabet.len() as f32;
+
+        let mut alphabet_map: HashMap<u8, u8> = HashMap::new();
         for (index, item) in byte_alphabet.into_iter().enumerate() {
-            map.insert(item, index as u8);
+            alphabet_map.insert(item, index as u8);
+        }
+
+        // turn the data into vector of map 
+        // all of these numbers will be < byte_alphabet.len()
+        let data: Vec<u8> = data
+            .iter()
+            .map(|x| alphabet_map[x])
+            .collect();
+
+        // llvm will fix this right?
+        let chars_per_byte: f32 = 256.0 / alphabet_len;
+        let num_bytes: usize = (chars_per_byte * data.len() as f32).ceil() as usize;
+        let mut new_data: Vec<u8> = vec![0; num_bytes];
+
+        for (i, datum) in data.iter().enumerate() {
+
         }
 
         todo!();

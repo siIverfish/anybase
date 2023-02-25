@@ -3,8 +3,7 @@
 
 #[cfg(test)]
 mod tests {
-    use anybase::bytes_manipulation::multiply_bytes;
-    use anybase::bytes_manipulation::add_bytes;
+    use anybase::bytes_manipulation::*;
 
 
     // ---------------------------- add_bytes tests ----------------------------
@@ -40,7 +39,7 @@ mod tests {
 
     #[test]
     fn test_multiply_bytes() {
-        assert_eq!(multiply_bytes(vec![1, 2, 3], vec![4, 5, 6]), vec![4, 13, 28, 27, 18]);
+        assert_eq!(multiply_bytes(&vec![1, 2, 3], &vec![4, 5, 6]), vec![4, 13, 28, 27, 18]);
     }
 
     #[test]
@@ -58,7 +57,7 @@ mod tests {
             .skip_while(|&x| x == 0)
             .collect();
 
-        assert_eq!(multiply_bytes(vec1, vec2), result);
+        assert_eq!(multiply_bytes(&vec1, &vec2), result);
     }
 
     #[test]
@@ -76,7 +75,7 @@ mod tests {
             .skip_while(|&x| x == 0)
             .collect();
 
-        assert_eq!(multiply_bytes(vec1, vec2), result);
+        assert_eq!(multiply_bytes(&vec1, &vec2), result);
     }
 
     #[test]
@@ -94,7 +93,7 @@ mod tests {
             .skip_while(|&x| x == 0)
             .collect();
 
-        assert_eq!(multiply_bytes(vec1, vec2), result);
+        assert_eq!(multiply_bytes(&vec1, &vec2), result);
     }
 
     #[test]
@@ -112,6 +111,64 @@ mod tests {
             .skip_while(|&x| x == 0)
             .collect();
 
-        assert_eq!(multiply_bytes(vec1, vec2), result);
+        assert_eq!(multiply_bytes(&vec1, &vec2), result);
+    }
+
+    // ----------------------------------------------- pow_bytes tests -----------------------------------------------
+
+    #[test]
+    fn test_pow_bytes_vs_multiply() {
+        assert_eq!(
+            pow_bytes(&vec![2, 3], 2), 
+            multiply_bytes(&vec![2, 3], &vec![2, 3])
+        );
+    }
+
+    #[test]
+    fn test_pow_bytes_1() {
+        let num: u64 = 2;
+        let pow: u64 = 3;
+
+        let vec   = (num).to_be_bytes().to_vec();
+        let result: Vec<u8> = (num.pow(pow as u32))
+            .to_be_bytes()
+            .to_vec()
+            .into_iter()
+            .skip_while(|&x| x == 0)
+            .collect();
+
+        assert_eq!(pow_bytes(&vec, pow), result);
+    }
+
+    #[test]
+    fn test_pow_bytes_2() {
+        let num: u64 = 2345423;
+        let pow: u64 = 3;
+
+        let vec   = (num).to_be_bytes().to_vec();
+        let result: Vec<u8> = (num.pow(pow as u32))
+            .to_be_bytes()
+            .to_vec()
+            .into_iter()
+            .skip_while(|&x| x == 0)
+            .collect();
+
+        assert_eq!(pow_bytes(&vec, pow), result);
+    }
+
+    #[test]
+    fn test_pow_bytes_3() {
+        let num: u64 = 12;
+        let pow: u64 = 17;
+
+        let vec   = (num).to_be_bytes().to_vec();
+        let result: Vec<u8> = (num.pow(pow as u32))
+            .to_be_bytes()
+            .to_vec()
+            .into_iter()
+            .skip_while(|&x| x == 0)
+            .collect();
+
+        assert_eq!(pow_bytes(&vec, pow), result);
     }
 }
