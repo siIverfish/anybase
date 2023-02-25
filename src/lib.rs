@@ -50,12 +50,13 @@ pub mod bytes_manipulation {
         }
     }
     
-    pub fn multiply_bytes(larger: Vec<u8>, smaller: Vec<u8>) -> Vec<u8> { // TODO
+    pub fn multiply_bytes(larger: Vec<u8>, smaller: Vec<u8>) -> Vec<u8> { // TODO failing: test_max_multiply_bytes
         let mut new_bytes: Vec<u8> = vec![0; larger.len() * 2];
     
         for (index_1, byte_1) in (&larger).iter().rev().enumerate() {
             for (index_2, byte_2) in (&smaller).iter().rev().enumerate()  {
                 let mut mult_result_vector: Vec<u8> = vec![0; index_1 + index_2 + 2];
+                
                 (mult_result_vector[0], mult_result_vector[1]) = split_word((*byte_1 as u16) * (*byte_2 as u16));
 
                 if mult_result_vector[0] == 0 {
