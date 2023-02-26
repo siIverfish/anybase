@@ -75,7 +75,20 @@ pub mod bytes_manipulation {
         }
     }
     
-    pub fn sub_bytes(larger: &Vec<u8>, smaller: &Vec<u8>) -> Vec<u8> { // this function will scream & cry if the first number is smaller than the second
+    pub fn sub_bytes(larger: &Vec<u8>, smaller: &Vec<u8>) -> Vec<u8> {
+
+        
+        // manually handling edge cases
+        if eq_bytes(larger, smaller) {
+            return vec![];
+        }
+
+        // this is fiiine
+        assert!(
+            gt_bytes(larger, smaller),
+            "the code subtracted weird. try again."
+        );
+
         let mut new_vec: Vec<u8> = vec![0; larger.len()];
         let mut carry_subtractor: u8 = 0;
 
@@ -87,10 +100,6 @@ pub mod bytes_manipulation {
         } else {
             smaller.clone()
         };
-
-        if eq_bytes(larger, smaller) {
-            return vec![]; // maybe could be an empty vec?
-        }
 
         let smaller = &new_smaller;
 

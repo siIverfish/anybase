@@ -64,6 +64,11 @@ mod test_sub {
     fn same() {
         assert_eq!(sub_bytes(&vec![5, 34, 123], &vec![5, 34, 123]), Vec::<u8>::new());
     }
+
+    #[test]
+    fn more_padding_zeroes() {
+        // todo
+    }
 }
 
 #[cfg(test)]
@@ -341,6 +346,22 @@ mod test_mod_bytes {
         assert_eq!(mod_bytes(&vec1, &vec2), result);
     }
 
+    #[test]
+    fn test_mod_bytes_2() {
+        let num: u64 = 23464456;
+        let mod_: u64 = 345;
+
+        let vec1   = (num).to_be_bytes().to_vec();
+        let vec2  = (mod_).to_be_bytes().to_vec();
+        let result: Vec<u8> = (num % mod_)
+            .to_be_bytes()
+            .to_vec()
+            .into_iter()
+            .skip_while(|&x| x == 0)
+            .collect();
+
+        assert_eq!(mod_bytes(&vec1, &vec2), result);
+    }
 }
 
 
