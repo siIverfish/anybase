@@ -20,11 +20,11 @@ mod uint_splitting {
 pub mod bytes_manipulation {
     use std::num;
 
-    use crate::uint_splitting::split_word;
+    use crate::uint_splitting::*;
 
     // this should probably be a class in the future
 
-    pub fn add_bytes(larger: Vec<u8>, smaller: Vec<u8>) -> Vec<u8> {
+    pub fn add_bytes(larger: &Vec<u8>, smaller: &Vec<u8>) -> Vec<u8> {
         // println!("larger: {:?}\nsmaller: {:?}", larger, smaller);
 
         let smaller = if smaller.len() < larger.len() {
@@ -32,7 +32,7 @@ pub mod bytes_manipulation {
             new_smaller.extend_from_slice(&smaller);
             new_smaller
         } else {
-            smaller
+            smaller.clone()
         };
 
         let mut carry: u8 = 0;
@@ -75,6 +75,33 @@ pub mod bytes_manipulation {
         }
     }
     
+    pub fn sub_bytes(larger: &Vec<u8>, smaller: &Vec<u8>) -> Vec<u8> { // this function will scream & cry if the first number is smaller than the second
+        let mut new_vec: Vec<u8> = vec![0; larger.len()];
+        let mut carry_subtractor: u8 = 0;
+
+        // copied from add_bytes, should probably be a function
+        let new_smaller = if smaller.len() < larger.len() {
+            let mut new_smaller: Vec<u8> = vec![0; larger.len() - smaller.len()];
+            new_smaller.extend_from_slice(&smaller);
+            new_smaller
+        } else {
+            smaller.clone()
+        };
+        
+        let smaller = &new_smaller;
+
+        // note: larger_byte not actually larger
+        for (index, (&larger_byte, &smaller_byte)) in larger.into_iter().zip(smaller).enumerate().rev() {
+            let (new_amount, first_overflow)  = larger_byte.overflowing_sub(smaller_byte);
+            let (new_amount, second_overflow) = new_amount.overflowing_sub(carry_subtractor);
+            // index starts at new_value.len() - 1
+            new_vec[index] = new_amount;
+            carry_subtractor = (first_overflow || second_overflow) as u8;
+        }
+
+        strip_leading_zeroes(&new_vec)
+    }
+
     pub fn multiply_bytes(larger: &Vec<u8>, smaller: &Vec<u8>) -> Vec<u8> {
         let mut new_bytes: Vec<u8> = vec![0; larger.len() * 2];
 
@@ -96,7 +123,7 @@ pub mod bytes_manipulation {
                     mult_result_vector = mult_result_vector[1..].to_vec();
                 }
 
-                new_bytes = add_bytes(new_bytes, mult_result_vector);
+                new_bytes = add_bytes(&new_bytes, &mult_result_vector);
             }
         }
 
@@ -132,21 +159,33 @@ pub mod bytes_manipulation {
         let bytes1: Vec<u8> = strip_leading_zeroes(bytes1);
         let bytes2: Vec<u8> = strip_leading_zeroes(bytes2);
 
+        // if one is longer then it's the greater one
         if bytes1.len() != bytes2.len() {
             return bytes1.len() > bytes2.len();
         }
 
+        // loop through them -- big endian
         for (byte1, byte2) in bytes1.into_iter().zip(bytes2) {
             if byte1 != byte2 {
                 return byte1 > byte2;
             }
         }
 
+        // defaults to false if they're equal
         false
     }
 
-    pub fn mod_bytes(bytes: &Vec<u8>, modulus: &Vec<u8>) -> Vec<u8> {
-        
+    pub fn mod_bytes(bytes: &Vec<u8>, modulus: &Vec<u8>) -> Vec<u8> { // todo: binary search here like decent person
+        let mut multiplier: u32 = 1;
+        while gt_bytes(
+            bytes, 
+            &multiply_bytes(
+                modulus, 
+                &split_dword(multiplier).to_vec()
+            )
+        ) {
+            multiplier += 1;
+        }
 
         todo!();
     }
@@ -198,7 +237,7 @@ pub mod storage {
                 )
             );
             println!("DATUM: {:?}", datum);
-            new_data = add_bytes(new_data, datum);
+            new_data = add_bytes(&new_data, &datum);
             // uncomment for debugging
             println!("NEW: {:?}", new_data);
             println!("byte power: {:?}", 
