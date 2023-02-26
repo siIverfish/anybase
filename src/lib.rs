@@ -18,8 +18,6 @@ mod uint_splitting {
 }
 
 pub mod bytes_manipulation {
-    use std::num;
-
     use crate::uint_splitting::*;
 
     // this should probably be a class in the future
@@ -300,9 +298,9 @@ pub mod storage {
         let mut new_data: Vec<u8> = vec![0; num_bytes];
 
         // uncomment for debugging
-        println!("chars_per_byte: {}", chars_per_byte);
-        println!("(data.len() as f32 / chars_per_byte): {}", (data.len() as f32 / chars_per_byte));
-        println!("num_bytes: {}", num_bytes);
+        // println!("chars_per_byte: {}", chars_per_byte);
+        // println!("(data.len() as f32 / chars_per_byte): {}", (data.len() as f32 / chars_per_byte));
+        // println!("num_bytes: {}", num_bytes);
 
 
         for (i, datum) in data.iter().rev().enumerate() {
@@ -313,17 +311,17 @@ pub mod storage {
                     i as u64
                 )
             );
-            println!("DATUM: {:?}", datum);
+            // println!("DATUM: {:?}", datum);
             new_data = add_bytes(&new_data, &datum);
-            // uncomment for debugging
-            println!("NEW: {:?}", new_data);
-            println!("byte power: {:?}", 
-                &pow_bytes(
-                    &alphabet_len_as_bytes, 
-                    (i as u64) + 1
-                )
-            );
-            print!("\n");
+            // // uncomment for debugging
+            // println!("NEW: {:?}", new_data);
+            // println!("byte power: {:?}", 
+            //     &pow_bytes(
+            //         &alphabet_len_as_bytes, 
+            //         (i as u64) + 1
+            //     )
+            // );
+            // print!("\n");
         }
 
         new_data

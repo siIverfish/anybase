@@ -119,61 +119,11 @@ mod test_multiply {
         assert_eq!(multiply_bytes(&vec1, &vec2), result);
     }
 
-    #[test]
-    fn test_random_multiply_bytes_1() {
-        let num1: u64 = 340598;
-        let num2: u64 = 2987;
-
-        let vec1   = (num1).to_be_bytes().to_vec();
-        let vec2   = (num2).to_be_bytes().to_vec();
-
-        let result: Vec<u8> = (num1 * num2)
-            .to_be_bytes()
-            .to_vec()
-            .into_iter()
-            .skip_while(|&x| x == 0)
-            .collect();
-
-        assert_eq!(multiply_bytes(&vec1, &vec2), result);
-    }
-
-    #[test]
-    fn test_random_multiply_bytes_2() {
-        let num1: u64 = 23;
-        let num2: u64 = 29423487;
-
-        let vec1   = (num1).to_be_bytes().to_vec();
-        let vec2   = (num2).to_be_bytes().to_vec();
-
-        let result: Vec<u8> = (num1 * num2)
-            .to_be_bytes()
-            .to_vec()
-            .into_iter()
-            .skip_while(|&x| x == 0)
-            .collect();
-
-        assert_eq!(multiply_bytes(&vec1, &vec2), result);
-    }
-
+    
+    test_against_function!(test_random_multiply_bytes_1, multiply_bytes, u64::wrapping_mul, 340598, 2987);
+    test_against_function!(test_random_multiply_bytes_2, multiply_bytes, u64::wrapping_mul, 23, 29423487);
     test_against_function!(test_random_multiply_bytes_3, multiply_bytes, u64::wrapping_mul, 456546, 2982317);
 
-    // #[test]
-    // fn test_random_multiply_bytes_3() {
-    //     let num1: u64 = 456546;
-    //     let num2: u64 = 2982317;
-
-    //     let vec1   = (num1).to_be_bytes().to_vec();
-    //     let vec2   = (num2).to_be_bytes().to_vec();
-
-    //     let result: Vec<u8> = (num1 * num2)
-    //         .to_be_bytes()
-    //         .to_vec()
-    //         .into_iter()
-    //         .skip_while(|&x| x == 0)
-    //         .collect();
-
-    //     assert_eq!(multiply_bytes(&vec1, &vec2), result);
-    // }
 
     #[test]
     fn test_multiply_with_empty() {
