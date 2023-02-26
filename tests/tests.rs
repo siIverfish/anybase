@@ -262,9 +262,62 @@ mod test_encode {
 
         assert_eq!(encode(&alphabet, &data), vec![0 as u8, 26 as u8]);
     }
+
+    #[test]
+    fn test_encode_two_bytes_1and0_2_other_alphabet() {
+        let alphabet: Vec<u8> = Vec::<u8>::from("ab".as_bytes());
+        let data:     Vec<u8> = Vec::<u8>::from("aaaaaaaaaaabbaba".as_bytes());
+
+        assert_eq!(encode(&alphabet, &data), vec![0 as u8, 26 as u8]);
+    }
+
+    #[test]
+    fn test_encode_two_bytes_1and0_2_other_alphabet_2() {
+        let alphabet: Vec<u8> = Vec::<u8>::from("abc".as_bytes());
+        let data:     Vec<u8> = Vec::<u8>::from("acaabbaba".as_bytes());
+
+        assert_eq!(encode(&alphabet, &data), vec![0 as u8]);
+
+        assert!(false);
+    }
+
+    // #[test]
+    // fn test_encode_vs_base32() {
+    //     let alphabet: Vec<u8> = Vec::<u8>::from("abcdefghijklmnopqrstuvwxyz ".as_bytes());
+    //     let data:     Vec<u8> = Vec::<u8>::from("hello world".as_bytes());
+        
+    //     println!("data: {:?}", data);
+    //     println!("alphabet: {:?}", alphabet);
+    //     println!("{:?}", encode(&alphabet, &data));
+
+    //     assert!(false);
+    // }
 }
 
+#[cfg(test)]
+mod test_mod_bytes {
+    use anybase::bytes_manipulation::*;
 
+    // ----------------------------------------------- mod_bytes tests -----------------------------------------------
+
+    #[test]
+    fn test_mod_bytes_1() {
+        let num: u64 = 2;
+        let mod_: u64 = 3;
+
+        let vec1   = (num).to_be_bytes().to_vec();
+        let vec2  = (mod_).to_be_bytes().to_vec();
+        let result: Vec<u8> = (num % mod_)
+            .to_be_bytes()
+            .to_vec()
+            .into_iter()
+            .skip_while(|&x| x == 0)
+            .collect();
+
+        assert_eq!(mod_bytes(&vec1, &vec2), result);
+    }
+
+}
 
 
 

@@ -18,7 +18,11 @@ mod uint_splitting {
 }
 
 pub mod bytes_manipulation {
+    use std::num;
+
     use crate::uint_splitting::split_word;
+
+    // this should probably be a class in the future
 
     pub fn add_bytes(larger: Vec<u8>, smaller: Vec<u8>) -> Vec<u8> {
         // println!("larger: {:?}\nsmaller: {:?}", larger, smaller);
@@ -115,6 +119,37 @@ pub mod bytes_manipulation {
 
         result
     }
+
+    pub fn strip_leading_zeroes(bytes: &Vec<u8>) -> Vec<u8> {
+        let mut num_leading_zeroes: usize = 0;
+        while bytes[num_leading_zeroes] == 0 {
+            num_leading_zeroes += 1;
+        }
+        bytes[num_leading_zeroes..].to_owned()
+    }
+
+    pub fn gt_bytes(bytes1: &Vec<u8>, bytes2: &Vec<u8>) -> bool { // this could probably be a macro that does all the operations
+        let bytes1: Vec<u8> = strip_leading_zeroes(bytes1);
+        let bytes2: Vec<u8> = strip_leading_zeroes(bytes2);
+
+        if bytes1.len() != bytes2.len() {
+            return bytes1.len() > bytes2.len();
+        }
+
+        for (byte1, byte2) in bytes1.into_iter().zip(bytes2) {
+            if byte1 != byte2 {
+                return byte1 > byte2;
+            }
+        }
+
+        false
+    }
+
+    pub fn mod_bytes(bytes: &Vec<u8>, modulus: &Vec<u8>) -> Vec<u8> {
+        
+
+        todo!();
+    }
 }
 
 pub mod storage {
@@ -129,8 +164,8 @@ pub mod storage {
 
         let mut alphabet_map: HashMap<u8, u8> = HashMap::new();
         for (index, &item) in byte_alphabet.into_iter().enumerate() {
-            println!("{}", item);
-            alphabet_map.insert(item, index as u8);
+            // println!("{}", item);
+            alphabet_map.insert(item, (index as u8) + 1);
         }
 
         // turn the data into vector of map 
@@ -138,18 +173,20 @@ pub mod storage {
         let data: Vec<u8> = data
             .iter()
             .map(|x| {
-                println!("{}", x);
+                // println!("{}", x);
                 alphabet_map[x]
             })
             .collect();
 
         // llvm will fix this right?
         let chars_per_byte: f32 = (256 as f32).log(alphabet_len);
-        // println!("chars_per_byte: {}", chars_per_byte);
-        // println!("(data.len() as f32 / chars_per_byte): {}", (data.len() as f32 / chars_per_byte));
         let num_bytes: usize = (data.len() as f32 / chars_per_byte).ceil() as usize;
-        // println!("num_bytes: {}", num_bytes);
         let mut new_data: Vec<u8> = vec![0; num_bytes];
+
+        // uncomment for debugging
+        println!("chars_per_byte: {}", chars_per_byte);
+        println!("(data.len() as f32 / chars_per_byte): {}", (data.len() as f32 / chars_per_byte));
+        println!("num_bytes: {}", num_bytes);
 
 
         for (i, datum) in data.iter().rev().enumerate() {
@@ -157,11 +194,12 @@ pub mod storage {
                 &vec![*datum], 
                 &pow_bytes(
                     &alphabet_len_as_bytes, 
-                    (i as u64)
+                    i as u64
                 )
             );
             println!("DATUM: {:?}", datum);
             new_data = add_bytes(new_data, datum);
+            // uncomment for debugging
             println!("NEW: {:?}", new_data);
             println!("byte power: {:?}", 
                 &pow_bytes(
@@ -178,4 +216,5 @@ pub mod storage {
     pub fn decode(_alphabet: Vec<u8>, _data: Vec<u8>) -> Vec<u8> {
         todo!();
     }
+
 }
