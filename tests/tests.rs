@@ -1,5 +1,24 @@
 
 
+macro_rules! test_against_function {
+    ( $name:ident, $test_function:expr, $against:expr, $arg1:expr, $arg2:expr ) => {
+        #[test]
+        pub fn $name() {
+            let vec1   = ($arg1 as u64).to_be_bytes().to_vec();
+            let vec2   = ($arg2 as u64).to_be_bytes().to_vec();
+
+            let result: Vec<u8> = ( $against( $arg1 as u64, $arg2 as u64 ) )
+                .to_be_bytes()
+                .to_vec()
+                .into_iter()
+                .skip_while(|&x| x == 0)
+                .collect();
+
+            assert_eq!($test_function(&vec1, &vec2), result);
+        }
+    };
+}
+
 
 #[cfg(test)]
 mod test_add {
@@ -136,23 +155,25 @@ mod test_multiply {
         assert_eq!(multiply_bytes(&vec1, &vec2), result);
     }
 
-    #[test]
-    fn test_random_multiply_bytes_3() {
-        let num1: u64 = 456546;
-        let num2: u64 = 2982317;
+    test_against_function!(test_random_multiply_bytes_3, multiply_bytes, u64::wrapping_mul, 456546, 2982317);
 
-        let vec1   = (num1).to_be_bytes().to_vec();
-        let vec2   = (num2).to_be_bytes().to_vec();
+    // #[test]
+    // fn test_random_multiply_bytes_3() {
+    //     let num1: u64 = 456546;
+    //     let num2: u64 = 2982317;
 
-        let result: Vec<u8> = (num1 * num2)
-            .to_be_bytes()
-            .to_vec()
-            .into_iter()
-            .skip_while(|&x| x == 0)
-            .collect();
+    //     let vec1   = (num1).to_be_bytes().to_vec();
+    //     let vec2   = (num2).to_be_bytes().to_vec();
 
-        assert_eq!(multiply_bytes(&vec1, &vec2), result);
-    }
+    //     let result: Vec<u8> = (num1 * num2)
+    //         .to_be_bytes()
+    //         .to_vec()
+    //         .into_iter()
+    //         .skip_while(|&x| x == 0)
+    //         .collect();
+
+    //     assert_eq!(multiply_bytes(&vec1, &vec2), result);
+    // }
 
     #[test]
     fn test_multiply_with_empty() {
@@ -255,7 +276,6 @@ mod test_pow {
         assert_eq!(pow_bytes(&vec, pow), result);
     }
 }
-
 
 mod test_encode {
     use anybase::storage::*;
@@ -362,6 +382,7 @@ mod test_mod_bytes {
 
         assert_eq!(mod_bytes(&vec1, &vec2), result);
     }
+
 }
 
 

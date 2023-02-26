@@ -168,7 +168,7 @@ pub mod bytes_manipulation {
         bytes[num_leading_zeroes..].to_owned()
     }
 
-    pub fn gt_bytes(bytes1: &Vec<u8>, bytes2: &Vec<u8>) -> bool { // this could probably be a macro that does all the operations
+    pub fn gt_bytes(bytes1: &Vec<u8>, bytes2: &Vec<u8>) -> bool { // this could probably be a macro that does all the operations but i dont know how to do that
         let bytes1: Vec<u8> = strip_leading_zeroes(bytes1);
         let bytes2: Vec<u8> = strip_leading_zeroes(bytes2);
 
@@ -188,6 +188,34 @@ pub mod bytes_manipulation {
         false
     }
 
+    pub fn lt_bytes(bytes1: &Vec<u8>, bytes2: &Vec<u8>) -> bool {
+        let bytes1: Vec<u8> = strip_leading_zeroes(bytes1);
+        let bytes2: Vec<u8> = strip_leading_zeroes(bytes2);
+
+        // if one is longer then it's the greater one
+        if bytes1.len() != bytes2.len() {
+            return bytes1.len() < bytes2.len();
+        }
+
+        // loop through them -- big endian
+        for (byte1, byte2) in bytes1.into_iter().zip(bytes2) {
+            if byte1 != byte2 {
+                return byte1 < byte2;
+            }
+        }
+
+        // defaults to false if they're equal
+        false
+    }
+
+    pub fn gte_bytes(bytes1: &Vec<u8>, bytes2: &Vec<u8>) -> bool { // !lt_bytes
+        !lt_bytes(bytes1, bytes2)
+    }
+
+    pub fn lte_bytes(bytes1: &Vec<u8>, bytes2: &Vec<u8>) -> bool { // !gt_bytes
+        !gt_bytes(bytes1, bytes2)
+    }
+
     pub fn eq_bytes(bytes1: &Vec<u8>, bytes2: &Vec<u8>) -> bool {
         let bytes1: Vec<u8> = strip_leading_zeroes(bytes1);
         let bytes2: Vec<u8> = strip_leading_zeroes(bytes2);
@@ -205,14 +233,14 @@ pub mod bytes_manipulation {
         true
     }
 
-    pub fn mod_bytes(bytes: &Vec<u8>, modulus: &Vec<u8>) -> Vec<u8> { // todo: binary search here like decent person
-        let mut multiplier: u32 = 1;
+    pub fn mod_bytes(bytes: &Vec<u8>, modulus: &Vec<u8>) -> Vec<u8> { // todo: binary search here like decent person & this function cant have modulus 1
+        let mut multiplier: u32 = 0;
 
-        while gt_bytes(
+        while gte_bytes(
             bytes, 
             &multiply_bytes(
                 modulus, 
-                &split_dword(multiplier).to_vec()
+                &split_dword(multiplier+1).to_vec()
             )
         ) {
             multiplier += 1;
@@ -226,13 +254,16 @@ pub mod bytes_manipulation {
             )
         );
 
+        // strip_leading_zeroes(
         sub_bytes(
-            bytes,
-            &multiply_bytes(
-                modulus,
-                &split_dword(multiplier).to_vec()
+                bytes,
+                &multiply_bytes(
+                    modulus,
+                    &split_dword(multiplier).to_vec()
+                )
             )
-        )
+        // )
+
     }
 
 }
